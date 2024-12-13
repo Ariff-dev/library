@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 require_once '../db/db_config.php';
 
 ?>
@@ -14,9 +14,8 @@ require_once '../db/db_config.php';
 
 <body>
     <h1>¡Unete a esta gran librería!</h1>
-
     <?php
-
+    // TODO: Crear Sesión al momento de crear cuenta y redirigir al home page de la app 
     function iduser()
     {
         $idgenerada = uniqid();
@@ -32,13 +31,7 @@ require_once '../db/db_config.php';
     $resultados = $stmt->fetchAll();
 
     // Imprime los resultados
-    foreach ($resultados as $resultado) {
-        echo "ID: " . $resultado['id_usuario'] . "<br>";
-        echo "Nombre: " . $resultado['nombreusr'] . "<br>";
-        echo "Email: " . $resultado['password'] . "<br>";
-        echo "Contraseña: " . $resultado['email'] . "<br>";
-        echo "<hr>";
-    }
+
 
     if ($_SERVER['REQUEST_METHOD'] === "POST") {
         $id_usuario = iduser();
@@ -50,6 +43,17 @@ require_once '../db/db_config.php';
             echo "Por favor, complete todos los campos.";
             exit;
         }
+
+        foreach ($resultados as $resultado) {
+            $emaildb = $resultado['email'];
+
+            if ($emaildb === $email) {
+                echo "Este usuario ya existe";
+                header("Location: login.php");
+                exit;
+            }
+        }
+
         // Encriptación de la contraseña
         $password_hash = password_hash($password, PASSWORD_DEFAULT);
         // Creación del usuario
@@ -62,7 +66,9 @@ require_once '../db/db_config.php';
             $stmt->execute();
             if ($stmt->rowCount() > 0) {
                 echo "Usuario creado correctamente!";
-                header("Location: confirmacion.php");
+                echo $_SESSION['id_usuario'] = $id_usuario;
+                header("Location: ../app/index.php");
+
                 exit;
             } else {
                 echo "Error al crear el usuario.";

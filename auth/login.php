@@ -8,15 +8,10 @@
 
 <body>
     <h1>¡Que bueno Verte!</h1>
-    <?php
-
-
-
-    ?>
     <form method="post">
         <label for="usernmae">
-            Tu usuario
-            <input type="text" name="username" id="auth-username" required>
+            Tu email
+            <input type="text" name="email" id="auth-email" required>
         </label>
         <label for="password">
             Contraseña
