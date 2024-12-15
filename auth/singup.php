@@ -1,91 +1,69 @@
 <?php
 session_start();
-require_once '../db/db_config.php';
+require_once '../db/db_config.php';  // Asegúrate de que esta sea la ruta correcta
 
+// Incluye la clase UsuarioManager
+require_once '../models/UsuarioManager.php';
+
+if ($_SERVER['REQUEST_METHOD'] === "POST") {
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    // Validación de datos
+    if (empty($name) || empty($email) || empty($password)) {
+        echo "Por favor, complete todos los campos.";
+        exit;
+    }
+
+    // Inicializa el manager de usuarios
+    $usuarioManager = new UsuarioManager($conn);
+
+    // Verificar si el correo ya está registrado
+    if ($usuarioManager->isEmailExist($email)) {
+        echo "Este usuario ya existe";
+        header("Location: login.php");
+        exit;
+    }
+
+    // Generar un nuevo id_usuario único
+    $id_usuario = uniqid();
+
+    // Encriptación de la contraseña
+    $password_hash = password_hash($password, PASSWORD_DEFAULT);
+
+    // Crear el nuevo usuario
+    try {
+        if ($usuarioManager->createUser($id_usuario, $name, $password_hash, $email)) {
+            $_SESSION['id_usuario'] = $id_usuario;  // Guardar el ID del usuario en la sesión
+            header("Location: ../app/index.php");
+            exit;
+        } else {
+            echo "Error al crear el usuario.";
+        }
+    } catch (PDOException $e) {
+        echo "Error al crear el usuario: " . $e->getMessage();
+    }
+}
 ?>
 
 <!DOCTYPE html>
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Singup</title>
+    <title>Registro</title>
 </head>
 
 <body>
-    <h1>¡Unete a esta gran librería!</h1>
-    <?php
-    // TODO: Crear Sesión al momento de crear cuenta y redirigir al home page de la app 
-    function iduser()
-    {
-        $idgenerada = uniqid();
-
-        return $idgenerada;
-    }
-    // Ahora puedes utilizar la variable $conn
-
-    $stmt = $conn->prepare("SELECT * FROM usuarios");
-    $stmt->execute();
-
-    // Obtiene los datos de la consulta
-    $resultados = $stmt->fetchAll();
-
-    // Imprime los resultados
-
-
-    if ($_SERVER['REQUEST_METHOD'] === "POST") {
-        $id_usuario = iduser();
-        $name = $_POST['name'];
-        $email = $_POST['email'];
-        $password = $_POST['password'];
-        // Validación de datos
-        if (empty($name) || empty($email) || empty($password)) {
-            echo "Por favor, complete todos los campos.";
-            exit;
-        }
-
-        foreach ($resultados as $resultado) {
-            $emaildb = $resultado['email'];
-
-            if ($emaildb === $email) {
-                echo "Este usuario ya existe";
-                header("Location: login.php");
-                exit;
-            }
-        }
-
-        // Encriptación de la contraseña
-        $password_hash = password_hash($password, PASSWORD_DEFAULT);
-        // Creación del usuario
-        try {
-            $stmt = $conn->prepare("INSERT INTO usuarios (id_usuario,nombreusr, password, email) VALUES (:idusr,:nombre, :password, :email)");
-            $stmt->bindParam(':idusr', $id_usuario);
-            $stmt->bindParam(':nombre', $name);
-            $stmt->bindParam(':password', $password_hash);
-            $stmt->bindParam(':email', $email);
-            $stmt->execute();
-            if ($stmt->rowCount() > 0) {
-                echo "Usuario creado correctamente!";
-                echo $_SESSION['id_usuario'] = $id_usuario;
-                header("Location: ../app/index.php");
-
-                exit;
-            } else {
-                echo "Error al crear el usuario.";
-            }
-        } catch (PDOException $e) {
-            echo "Error al crear el usuario: " . $e->getMessage();
-        }
-    }
-    // ...
-    ?>
-
+    <h1>¡Únete a esta gran librería!</h1>
     <form method="post">
-        <label for="username">
+        <label for="name">
             Nombre de usuario
             <input type="text" name="name" id="auth-name" required>
         </label>
-        <label for="usernmae">
+        <label for="email">
             Email
             <input type="email" name="email" id="auth-email" required>
         </label>
