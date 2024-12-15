@@ -94,7 +94,7 @@ class UsuarioManager
         $data = $stmt->fetch();
 
         if ($data) {
-            return new Usuario($data['id_usr'], $data['nombreusr'], $data['email']);
+            return new Usuario($data['id_usuario'], $data['nombreusr'], $data['email']);
         }
 
         return null;

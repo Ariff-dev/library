@@ -1,17 +1,18 @@
 <?php
-session_start();
 require_once '../db/db_config.php';
 require_once '../app/models/userManager.php';
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+session_start();
 
 // Verificar si el usuario ha iniciado sesión
 $id_usr = $_SESSION['id_usuario'] ?? null;
 
-echo $id_usr;
-
-if (!$id_usr) {
-    header("Location: /library/login.php");
-    exit;
-}
+// if (!$id_usr) {
+//     header("Location: /library/auth/login.php");
+//     exit;
+// }
 
 // Crear una instancia de UsuarioManager
 $usuarioManager = new UsuarioManager($conn);

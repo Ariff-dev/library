@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
         $_SESSION['email_usuario'] = $usuario->getEmail();
 
         // Redirigir al dashboard o área principal
-        header("Location:  ../app/index.php");
+        header("Location:  ../app/index.php ");
         exit;
     } else {
         echo "Credenciales incorrectas.";
