@@ -9,27 +9,20 @@ session_start();
 // Verificar si el usuario ha iniciado sesión
 $id_usr = $_SESSION['id_usuario'] ?? null;
 
-// if (!$id_usr) {
-//     header("Location: /library/auth/login.php");
-//     exit;
-// }
+echo $id_usr;
+
+
+if (!$id_usr) {
+    header("Location: /library/auth/login.php");
+    exit;
+}
 
 // Crear una instancia de UsuarioManager
 $usuarioManager = new UsuarioManager($conn);
 
-try {
-    // Obtener información del usuario
-    $usuario = $usuarioManager->getUserForId($id_usr);
 
-    if ($usuario) {
-        // Mostrar información del usuario
-        echo "ID: " . htmlspecialchars($usuario->getId()) . " - Nombre: " . htmlspecialchars($usuario->getNombre()) . "<br>";
-    } else {
-        echo "No se encontró el usuario.";
-    }
-} catch (Throwable $th) {
-    echo "Error: " . htmlspecialchars($th->getMessage());
-}
+$usuario = $usuarioManager->getUserForId($id_usr);
+
 
 $activePage = basename($_SERVER['PHP_SELF'], ".php");
 ?>
@@ -46,6 +39,9 @@ $activePage = basename($_SERVER['PHP_SELF'], ".php");
 <body>
     <main class="container">
         <?php include '../app/includes/sidebar.php'; ?>
+        <h1>Bienvenido a la librería <?php echo "ID: " . htmlspecialchars($usuario->getId()) . " - Nombre: " . htmlspecialchars($usuario->getNombre()); ?></h1>
+
+
     </main>
 </body>
 
